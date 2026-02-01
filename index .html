@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist : Mes règles tiennent-elles vraiment ?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container-card {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+        .checkbox-custom {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .checkbox-custom:checked {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+        .checkbox-custom:checked::after {
+            content: "✓";
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold;
+        }
+        .score-box {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-card">
+        <header class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-slate-800 mb-2">Mes règles tiennent-elles vraiment ?</h1>
+            <p class="text-slate-500 text-sm italic">Évaluez votre cadre en 60 secondes</p>
+        </header>
+
+        <div id="checklist" class="space-y-4">
+            <!-- Items are generated here -->
+        </div>
+
+        <div class="mt-8 p-6 bg-slate-50 rounded-xl border border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-lg font-semibold text-slate-700">Votre Score :</span>
+                <span id="score-display" class="text-3xl font-bold text-emerald-600">0 / 10</span>
+            </div>
+            
+            <div id="feedback-box" class="p-4 rounded-lg text-center font-medium hidden">
+                <p id="feedback-text"></p>
+            </div>
+        </div>
+
+        <footer class="mt-6 text-center">
+            <button onclick="resetChecklist()" class="text-slate-400 hover:text-slate-600 text-sm transition-colors">
+                Réinitialiser la checklist
+            </button>
+        </footer>
+    </div>
+
+    <script>
+        const rules = [
+            "J’ai 3 à 5 règles max à la maison.",
+            "Mes règles sont courtes et précises (pas “sois sage”).",
+            "Mon enfant peut répéter les règles (il les connaît).",
+            "Je parle en une phrase quand je donne une consigne.",
+            "Je ne répète pas 10 fois : je parle une fois.",
+            "J’ai 2 conséquences prêtes (simples et réalistes).",
+            "Quand la règle est cassée, j’applique (sans débat).",
+            "Devant les gens, je reste calme : je règle après.",
+            "Devoirs = non négociable (heure fixe + téléphone loin).",
+            "Si je rate un jour, je reprends le cadre le lendemain."
+        ];
+
+        const checklistContainer = document.getElementById('checklist');
+        const scoreDisplay = document.getElementById('score-display');
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackText = document.getElementById('feedback-text');
+
+        function init() {
+            rules.forEach((rule, index) => {
+                const div = document.createElement('div');
+                div.className = "flex items-start space-x-3 p-2 hover:bg-slate-50 rounded-lg transition-colors cursor-pointer";
+                div.onclick = (e) => {
+                    if (e.target.tagName !== 'INPUT') {
+                        const input = div.querySelector('input');
+                        input.checked = !input.checked;
+                        updateScore();
+                    }
+                };
+                
+                div.innerHTML = `
+                    <input type="checkbox" class="checkbox-custom mt-1" id="rule-${index}">
+                    <label class="text-slate-700 leading-tight cursor-pointer select-none">${rule}</label>
+                `;
+                checklistContainer.appendChild(div);
+            });
+
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', updateScore);
+            });
+        }
+
+        function updateScore() {
+            const checkedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            scoreDisplay.innerText = `${checkedCount} / 10`;
+            
+            feedbackBox.classList.remove('hidden');
+            
+            if (checkedCount <= 4) {
+                feedbackText.innerText = "⚠️ Cadre fragile (à renforcer)";
+                feedbackBox.className = "p-4 rounded-lg text-center font-medium bg-red-50 text-red-700 border border-red-100";
+            } else if (checkedCount <= 7) {
+                feedbackText.innerText = "⚖️ Bon début (à stabiliser)";
+                feedbackBox.className = "p-4 rounded-lg text-center font-medium bg-amber-50 text-amber-700 border border-amber-100";
+            } else {
+                feedbackText.innerText = "🛡️ Cadre solide (à maintenir)";
+                feedbackBox.className = "p-4 rounded-lg text-center font-medium bg-emerald-50 text-emerald-700 border border-emerald-100";
+            }
+        }
+
+        function resetChecklist() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            updateScore();
+            feedbackBox.classList.add('hidden');
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

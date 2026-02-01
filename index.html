@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diagnostic : Mon Cadre Éducatif</title>
+    <!-- Chargement de Tailwind CSS pour le style moderne -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Bibliothèque d'icônes Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Effets de célébration (confettis) -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <!-- Police premium Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -14,19 +18,25 @@
             background: #f0f2f5;
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: center; /* Centrage vertical absolu */
+            justify-content: center; /* Centrage horizontal absolu */
             padding: 20px;
+            margin: 0;
         }
         .glass-card {
             background: white;
             border-radius: 2.5rem;
             box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px; /* Largeur optimale pour ebook/web */
+            display: flex;
+            flex-direction: column;
             transition: all 0.5s ease;
         }
         .progress-bar {
             transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+        /* Style des cartes sélectionnées */
         .checkbox-input:checked + .card-content {
             border-color: #6366f1;
             background-color: #f5f3ff;
@@ -36,6 +46,7 @@
             border-color: #6366f1;
             transform: scale(1.1);
         }
+        /* Personnalisation de la barre de défilement */
         .custom-scroll::-webkit-scrollbar {
             width: 6px;
         }
@@ -50,15 +61,16 @@
 </head>
 <body>
 
-    <div class="glass-card w-full max-w-lg overflow-hidden flex flex-col">
-        <!-- Header -->
+    <div class="glass-card overflow-hidden">
+        <!-- En-tête -->
         <div class="p-8 pb-6 border-b border-slate-50">
-            <div class="flex justify-between items-start mb-6">
-                <div>
+            <div class="flex flex-col sm:flex-row justify-between items-center sm:items-start mb-6 gap-4">
+                <div class="text-center sm:text-left">
                     <span class="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase tracking-widest rounded-full mb-2">Auto-Évaluation</span>
                     <h1 class="text-3xl font-extrabold text-slate-900 leading-tight">Cadre Éducatif<br>60 Secondes</h1>
                 </div>
-                <div class="relative flex items-center justify-center">
+                <!-- Score Circulaire -->
+                <div class="relative flex items-center justify-center flex-shrink-0">
                     <svg class="w-16 h-16 transform -rotate-90">
                         <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="6" fill="transparent" class="text-slate-100" />
                         <circle id="circle-progress" cx="32" cy="32" r="28" stroke="currentColor" stroke-width="6" fill="transparent" 
@@ -69,178 +81,37 @@
                 </div>
             </div>
             
+            <!-- Barre de progression linéaire -->
             <div class="flex items-center gap-3">
                 <div class="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden">
                     <div id="bar-progress" class="progress-bar h-full bg-indigo-500 w-0"></div>
                 </div>
-                <span id="percentage-text" class="text-[11px] font-bold text-slate-400 w-8">0%</span>
+                <span id="percentage-text" class="text-[11px] font-bold text-slate-400 w-8 text-right">0%</span>
             </div>
         </div>
 
-        <!-- Checklist -->
-        <div class="px-8 py-6 space-y-3 custom-scroll overflow-y-auto max-h-[50vh]">
+        <!-- Checklist Interactive -->
+        <div class="px-8 py-6 space-y-3 custom-scroll overflow-y-auto max-h-[45vh]">
             <div id="checklist-container" class="space-y-3">
-                <!-- Items injected by JS -->
+                <!-- Items injectés par JS -->
             </div>
         </div>
 
-        <!-- Result Box -->
+        <!-- Zone de Résultats -->
         <div id="result-area" class="px-8 py-6 bg-slate-50/80 border-t border-slate-100 min-h-[140px]">
             <div id="empty-state" class="flex flex-col items-center justify-center text-slate-400 h-full py-4 text-center">
                 <i data-lucide="list-checks" class="w-8 h-8 mb-2 opacity-20 text-indigo-500"></i>
-                <p class="text-xs font-medium">Cochez vos points forts pour voir votre profil</p>
+                <p class="text-xs font-medium">Cochez vos réussites pour découvrir votre profil</p>
             </div>
 
-            <div id="result-content" class="hidden">
-                <div class="flex items-center gap-3 mb-3">
-                    <div id="status-icon-container" class="p-2 rounded-xl">
+            <div id="result-content" class="hidden animate-in fade-in duration-500">
+                <div class="flex items-center gap-3 mb-3 justify-center sm:justify-start">
+                    <div id="status-icon-container" class="p-2 rounded-xl shadow-sm">
                         <i id="status-icon" class="w-5 h-5"></i>
                     </div>
-                    <div>
-                        <h3 id="status-title" class="text-sm font-bold text-slate-900"></h3>
+                    <div class="text-left">
+                        <h3 id="status-title" class="text-sm font-bold text-slate-900 leading-none mb-1"></h3>
                         <p id="status-badge" class="text-[10px] font-bold uppercase tracking-wider"></p>
                     </div>
                 </div>
-                <p id="status-desc" class="text-slate-600 text-sm leading-relaxed mb-4 italic"></p>
-                <div id="next-step" class="bg-white p-3 rounded-xl border border-slate-200 text-[11px] text-slate-500">
-                    <strong class="text-indigo-600 uppercase tracking-tighter mr-1">Conseil action :</strong> <span id="next-step-text"></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="p-4 text-center border-t border-slate-100 bg-white">
-            <button onclick="resetAll()" class="group inline-flex items-center gap-2 text-slate-400 hover:text-indigo-600 transition-all text-[11px] font-bold uppercase tracking-widest">
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-500"></i>
-                Recommencer le diagnostic
-            </button>
-        </div>
-    </div>
-
-    <script>
-        const rulesData = [
-            { text: "J’ai 3 à 5 règles max à la maison.", icon: "list-ordered" },
-            { text: "Mes règles sont courtes et précises (pas “sois sage”).", icon: "message-square-text" },
-            { text: "Mon enfant peut répéter les règles (il les connaît).", icon: "brain-circuit" },
-            { text: "Je parle en une phrase quand je donne une consigne.", icon: "mic-2" },
-            { text: "Je ne répète pas 10 fois : je parle une fois.", icon: "megaphone-off" },
-            { text: "J’ai 2 conséquences prêtes (simples et réalistes).", icon: "hammer" },
-            { text: "Quand la règle est cassée, j’applique (sans débat).", icon: "gavel" },
-            { text: "Devant les gens, je reste calme : je règle après.", icon: "smile" },
-            { text: "Devoirs = non négociable (heure fixe + téléphone loin).", icon: "smartphone-off" },
-            { text: "Si je rate un jour, je reprends le cadre le lendemain.", icon: "calendar-check" }
-        ];
-
-        const dataLevels = {
-            fragile: {
-                title: "Cadre en construction",
-                badge: "Fragile",
-                color: "#f43f5e",
-                bgColor: "#fff1f2",
-                icon: "shield-alert",
-                desc: "Votre autorité s'épuise souvent dans la répétition. Le cadre manque de clarté pour l'enfant.",
-                next: "Choisissez UNE seule règle cette semaine et ne cédez JAMAIS sur celle-là."
-            },
-            moyen: {
-                title: "Cadre en équilibre",
-                badge: "Bon début",
-                color: "#f59e0b",
-                bgColor: "#fffbeb",
-                icon: "shield-half",
-                desc: "Les fondations sont posées. Les règles sont connues mais leur application manque parfois de constance.",
-                next: "Supprimez les avertissements multiples. Appliquez la conséquence dès le premier écart."
-            },
-            solide: {
-                title: "Maître du cadre",
-                badge: "Solide",
-                color: "#10b981",
-                bgColor: "#ecfdf5",
-                icon: "shield-check",
-                desc: "Bravo ! Votre cadre est clair, sécurisant et prévisible. Cela réduit énormément le stress familial.",
-                next: "Maintenez cette constance, c'est le plus beau cadeau de stabilité pour votre enfant."
-            }
-        };
-
-        function init() {
-            const container = document.getElementById('checklist-container');
-            container.innerHTML = rulesData.map((rule, i) => `
-                <div class="rule-card">
-                    <input type="checkbox" id="r-${i}" class="checkbox-input hidden" onchange="handleUpdate()">
-                    <label for="r-${i}" class="card-content flex items-center p-4 rounded-2xl bg-white border border-slate-100 cursor-pointer transition-all select-none">
-                        <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 mr-4 flex-shrink-0 transition-colors group-hover:bg-indigo-50">
-                            <i data-lucide="${rule.icon}" class="w-5 h-5"></i>
-                        </div>
-                        <span class="flex-1 text-slate-700 font-medium text-sm leading-tight">${rule.text}</span>
-                        <div class="check-box w-6 h-6 rounded-lg border-2 border-slate-200 flex items-center justify-center transition-all ml-4 flex-shrink-0 bg-white">
-                            <i data-lucide="check" class="w-4 h-4 text-white"></i>
-                        </div>
-                    </label>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        function handleUpdate() {
-            const checked = document.querySelectorAll('input:checked').length;
-            const total = rulesData.length;
-            const percent = (checked / total) * 100;
-            
-            document.getElementById('score-text').innerText = checked;
-            document.getElementById('percentage-text').innerText = `${Math.round(percent)}%`;
-            
-            document.getElementById('bar-progress').style.width = `${percent}%`;
-            const circle = document.getElementById('circle-progress');
-            const offset = 175.9 - (175.9 * checked / 10);
-            circle.style.strokeDashoffset = offset;
-
-            const color = checked <= 4 ? '#f43f5e' : (checked <= 7 ? '#f59e0b' : '#10b981');
-            document.getElementById('bar-progress').style.backgroundColor = color;
-            circle.style.color = color;
-            document.getElementById('score-text').style.color = color;
-
-            const empty = document.getElementById('empty-state');
-            const content = document.getElementById('result-content');
-            
-            if (checked > 0) {
-                empty.classList.add('hidden');
-                content.classList.remove('hidden');
-                
-                const level = checked <= 4 ? dataLevels.fragile : (checked <= 7 ? dataLevels.moyen : dataLevels.solide);
-                
-                document.getElementById('status-title').innerText = level.title;
-                document.getElementById('status-badge').innerText = level.badge;
-                document.getElementById('status-badge').style.color = level.color;
-                document.getElementById('status-desc').innerText = level.desc;
-                document.getElementById('next-step-text').innerText = level.next;
-                
-                const iconContainer = document.getElementById('status-icon-container');
-                iconContainer.style.backgroundColor = level.bgColor;
-                iconContainer.style.color = level.color;
-                
-                const iconEl = document.getElementById('status-icon');
-                iconEl.setAttribute('data-lucide', level.icon);
-                lucide.createIcons();
-
-                if (checked === 10) {
-                    confetti({
-                        particleCount: 150,
-                        spread: 80,
-                        origin: { y: 0.7 },
-                        colors: ['#6366f1', '#10b981', '#f59e0b']
-                    });
-                }
-            } else {
-                empty.classList.remove('hidden');
-                content.classList.add('hidden');
-            }
-        }
-
-        function resetAll() {
-            document.querySelectorAll('input').forEach(i => i.checked = false);
-            handleUpdate();
-        }
-
-            init();
-    </script>
-</body>
-</html>
+                <p id="status-desc"
